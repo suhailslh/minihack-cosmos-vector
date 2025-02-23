@@ -47,9 +47,11 @@ If you need to build your own lab environment, you need the following components
 
 1. Open **Visual Studio Code**.
 1. Press **CTRL+SHIFT+P** to open the command palette.
-1. Run +++**Git: Clone**+++ and clone the repository +++https://github.com/lgmorand/minihack-cosmos-vector.git+++.
-1. Navigate to the cloned repository directory.
-1. Right-click on the **src** folder and select **Open in integrated Terminal**. (or open any PowerShell terminal on your computer)
+2. Run **Git: Clone** and clone the repository **https://github.com/lgmorand/minihack-cosmos-vector.git**.
+3. Navigate to the cloned repository directory.
+4. Right-click on the **src** folder and select **Open in integrated Terminal**. (or open any PowerShell terminal on your computer)
+
+---
 
 ## Create Azure Resources
 
@@ -119,6 +121,8 @@ To create the necessary Azure resources for this lab:
     ```
 
 3. Copy and save the environment variables returned by the script in case you need them later. You can verify the resources created in the Azure portal.
+
+![Resources created](./assets/resources-created.png)
 
 4. Make sure that the **.env** file is populated with the resource information.
 
