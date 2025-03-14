@@ -1,1 +1,20 @@
 node_modules/
+src/cosmos-parameters.json
+
+# dont commit the workshop files
+src/node.js/Collections/products.js
+src/python/Collections/products.py
+src/python/SearchComponents/embeddings.py
+src/node.js/SearchComponents/embeddings.js
+src/python/Blobs/loadAndVectorize.py
+src/node.js/Blobs/loadAndVectorize.js
+src/python/SearchComponents/indexes.py
+src/node.js/SearchComponents/indexes.js
+src/python/SearchComponents/searches.py
+src/node.js/SearchComponents/searches.js
+src/python/SearchComponents/vectorSearch.py
+src/node.js/SearchComponents/vectorSearch.js
+src/python/SearchComponents/completion.py
+src/node.js/SearchComponents/completion.js
+src/.env
+*/__pycache__/*

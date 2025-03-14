@@ -93,11 +93,11 @@ if ($changeSubscription) {
 }
 
 # Set the resource group
-$resourceGroup = if ($resourceGroup) {$resourceGroup} elseif ($useEnvFile -and $envVars['resourceGroup']) { $envVars['resourceGroup'] } else { "msdocs-cosmosdb-rg-$randomIdentifier" }
+$resourceGroup = if ($resourceGroup) { $resourceGroup } elseif ($useEnvFile -and $envVars['resourceGroup']) { $envVars['resourceGroup'] } else { "msdocs-cosmosdb-rg-$randomIdentifier" }
 
 # Create a resource group
 if (! $skipCreatingResourceGroup) {
-    Write-Host "Creating $resourceGroup in $location..."
+    Write-Host "Creating $resourceGroup RG in $location..."
     Write-Host
 
     try {
@@ -114,12 +114,12 @@ if (! $skipCreatingResourceGroup) {
 
 
 # Create MongoDB resources
-$cosmosCluster = if ($cosmosCluster) {$cosmosCluster} elseif ($useEnvFile -and $envVars['cosmosCluster']) { $envVars['cosmosCluster'] } else { "msdocs-account-cosmos-cluster-$randomIdentifier" } #needs to be lower case
-$cosmosClusterLocation = if ($cosmosClusterLocation) {$cosmosClusterLocation} elseif ($useEnvFile -and $envVars['cosmosClusterLocation']) { $envVars['cosmosClusterLocation'] } else { $location } 
-$cosmosClusterAdmin = if ($cosmosClusterAdmin) {$cosmosClusterAdmin} elseif ($useEnvFile -and $envVars['cosmosClusterAdmin']) { $envVars['cosmosClusterAdmin'] } else { "clusteradmin$randomIdentifier" }
-$tempPW = -join ((48..57) + (65..90) + (97..122) + (33..33) + (36..38) + (40..47) + (58..64) + (91..95) + (123..126) | Get-Random -Count 16 | % {[char]$_})
-$cosmosClusterPassword = if ($cosmosClusterPassword) {$cosmosClusterPassword} elseif ($useEnvFile -and $envVars['cosmosClusterPassword']) { $envVars['cosmosClusterPassword'] } else { $tempPW  }
-$cosmosdbDatabase = if ($cosmosdbDatabase) {$cosmosdbDatabase} elseif ($useEnvFile -and $envVars['cosmosdbDatabase']) { $envVars['cosmosdbDatabase'] } else { "cosmicworks" }
+$cosmosCluster = if ($cosmosCluster) { $cosmosCluster } elseif ($useEnvFile -and $envVars['cosmosCluster']) { $envVars['cosmosCluster'] } else { "msdocs-cosmos-cluster-$randomIdentifier" } #needs to be lower case
+$cosmosClusterLocation = if ($cosmosClusterLocation) { $cosmosClusterLocation } elseif ($useEnvFile -and $envVars['cosmosClusterLocation']) { $envVars['cosmosClusterLocation'] } else { 'eastus' } 
+$cosmosClusterAdmin = if ($cosmosClusterAdmin) { $cosmosClusterAdmin } elseif ($useEnvFile -and $envVars['cosmosClusterAdmin']) { $envVars['cosmosClusterAdmin'] } else { "clusteradmin$randomIdentifier" }
+$tempPW = -join ((48..57) + (65..90) + (97..122) + (33..33) + (36..38) + (40..47) + (58..64) + (91..95) + (123..126) | Get-Random -Count 16 | % { [char]$_ })
+$cosmosClusterPassword = if ($cosmosClusterPassword) { $cosmosClusterPassword } elseif ($useEnvFile -and $envVars['cosmosClusterPassword']) { $envVars['cosmosClusterPassword'] } else { $tempPW }
+$cosmosdbDatabase = if ($cosmosdbDatabase) { $cosmosdbDatabase } elseif ($useEnvFile -and $envVars['cosmosdbDatabase']) { $envVars['cosmosdbDatabase'] } else { "cosmicworks" }
 
 if (! $skipCreatingCosmosDBPublicIPFirewallRule) {
     # Create a public IP firewall rule for the Cosmos DB account
@@ -137,8 +137,34 @@ if (! $skipCreatingCosmosDBCluster) {
     Write-Host "Creating $cosmosCluster cluster, this could take 10+ minutes to create..."
     Write-Host
 
+    $cosmosParameters = @{
+        "$schema"        = "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#"
+        "contentVersion" = "1.0.0.0"
+        "parameters"     = @{
+            "clusterName"      = @{
+                "value" = $cosmosCluster
+            }
+            "dblocation"       = @{
+                "value" = $cosmosClusterLocation
+            }
+            "adminUsername"    = @{
+                "value" = $cosmosClusterAdmin
+            }
+            "adminPassword"    = @{
+                "value" = $cosmosClusterPassword
+            }
+            "publicIpRuleName" = @{
+                "value" = $publicIpRuleName
+            }
+            "publicIp"         = @{
+                "value" = $publicIp
+            }
+        }
+    }
+
+    $cosmosParameters | ConvertTo-Json -Depth 10 | Out-File -FilePath 'cosmos-parameters.json' -Encoding utf8
     try {
-        $output = az deployment group create --resource-group $resourceGroup --template-file 'create-mongodb-vcore-cluster.bicep' --parameters "clusterName=`"$cosmosCluster`"" "location=`"$cosmosClusterLocation`"" "adminUsername=`"$cosmosClusterAdmin`"" "adminPassword=`"$cosmosClusterPassword`"" "publicIpRuleName=`"$publicIpRuleName`"" "publicIp=`"$publicIp`"" --only-show-errors
+        $output = az deployment group create --resource-group $resourceGroup --template-file 'create-mongodb-vcore-cluster.bicep'  --parameters @cosmos-parameters.json
         if ($LASTEXITCODE -ne 0) {
             throw $output
         }
@@ -154,9 +180,9 @@ $cosmosDbEndpoint = if ($useEnvFile -and $envVars['cosmosDbEndpoint']) { $envVar
 
 # Create an Azure OpenAI resource
 $cognitiveServicesKind = if ($useEnvFile -and $envVars['cognitiveServicesKind']) { $envVars['cognitiveServicesKind'] } else { "OpenAI" }
-$OpenAIAccount = if ($OpenAIAccount) {$OpenAIAccount} elseif ($useEnvFile -and $envVars['OpenAIAccount']) { $envVars['OpenAIAccount'] } else { "msdocs-account-openai-$randomIdentifier" } #needs to be lower case
-$OpenAIAccountLocation = if ($OpenAIAccountLocation) {$OpenAIAccountLocation} elseif ($useEnvFile -and $envVars['OpenAIAccountLocation']) { $envVars['OpenAIAccountLocation'] } else { $location } 
-$OpenAIAccountSKU = if ($OpenAIAccountSKU) {$OpenAIAccountSKU} elseif ($useEnvFile -and $envVars['OpenAIAccountSKU']) { $envVars['OpenAIAccountSKU'] } else { "s0" }
+$OpenAIAccount = if ($OpenAIAccount) { $OpenAIAccount } elseif ($useEnvFile -and $envVars['OpenAIAccount']) { $envVars['OpenAIAccount'] } else { "msdocs-account-openai-$randomIdentifier" } #needs to be lower case
+$OpenAIAccountLocation = if ($OpenAIAccountLocation) { $OpenAIAccountLocation } elseif ($useEnvFile -and $envVars['OpenAIAccountLocation']) { $envVars['OpenAIAccountLocation'] } else { $location } 
+$OpenAIAccountSKU = if ($OpenAIAccountSKU) { $OpenAIAccountSKU } elseif ($useEnvFile -and $envVars['OpenAIAccountSKU']) { $envVars['OpenAIAccountSKU'] } else { "s0" }
 
 # Create an Azure OpenAI account
 if (! $skipCreatingAzureOpenAIAccount) {
@@ -176,12 +202,12 @@ if (! $skipCreatingAzureOpenAIAccount) {
     }
 }
 
-$OpenAIDeploymentName = if ($OpenAIDeploymentName) {$OpenAIDeploymentName} elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "msdocs-account-openai-deployment-$randomIdentifier" }
-$OpenAIDeploymentModel = if ($OpenAIDeploymentModel) {$OpenAIDeploymentModel} elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
+$OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "msdocs-account-openai-deployment-$randomIdentifier" }
+$OpenAIDeploymentModel = if ($OpenAIDeploymentModel) { $OpenAIDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
 $OpenAIDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAIDeploymentModelFormat']) { $envVars['OpenAIDeploymentModelFormat'] } else { "OpenAI" }
-$OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) {$OpenAIDeploymentModelVersion} elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
-$OpenAIDeploymentSKU = if ($OpenAIDeploymentSKU) {$OpenAIDeploymentSKU} elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKU']) { $envVars['OpenAIDeploymentSKU'] } else { "Standard" }
-$OpenAIDeploymentSKUCapacity = if ($OpenAIDeploymentSKUCapacity) {$OpenAIDeploymentSKUCapacity} elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKUCapacity']) { $envVars['OpenAIDeploymentSKUCapacity'] } else { 100 }
+$OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) { $OpenAIDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
+$OpenAIDeploymentSKU = if ($OpenAIDeploymentSKU) { $OpenAIDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKU']) { $envVars['OpenAIDeploymentSKU'] } else { "Standard" }
+$OpenAIDeploymentSKUCapacity = if ($OpenAIDeploymentSKUCapacity) { $OpenAIDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKUCapacity']) { $envVars['OpenAIDeploymentSKUCapacity'] } else { 100 }
 
 # Create a new deployment for the Azure OpenAI account
 if (! $skipCreatingAzureOpenAIDeployment) {
@@ -201,12 +227,12 @@ if (! $skipCreatingAzureOpenAIDeployment) {
     }
 }
 
-$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) {$OpenAICompletionDeploymentName} elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "msdocs-account-openai-completion-$randomIdentifier" }
-$OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) {$OpenAICompletionDeploymentModel} elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-35-turbo" }
+$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "msdocs-account-openai-completion-$randomIdentifier" }
+$OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) { $OpenAICompletionDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-4o" }
 $OpenAICompletionDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelFormat']) { $envVars['OpenAICompletionDeploymentModelFormat'] } else { "OpenAI" }
-$OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) {$OpenAICompletionDeploymentModelVersion} elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "0125" }
-$OpenAICompletionDeploymentSKU = if ($OpenAICompletionDeploymentSKU) {$OpenAICompletionDeploymentSKU} elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKU']) { $envVars['OpenAICompletionDeploymentSKU'] } else { "Standard" }
-$OpenAICompletionDeploymentSKUCapacity = if ($OpenAICompletionDeploymentSKUCapacity) {$OpenAICompletionDeploymentSKUCapacity} elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKUCapacity']) { $envVars['OpenAICompletionDeploymentSKUCapacity'] } else { 100 }
+$OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) { $OpenAICompletionDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "2024-08-06" }
+$OpenAICompletionDeploymentSKU = if ($OpenAICompletionDeploymentSKU) { $OpenAICompletionDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKU']) { $envVars['OpenAICompletionDeploymentSKU'] } else { "Standard" }
+$OpenAICompletionDeploymentSKUCapacity = if ($OpenAICompletionDeploymentSKUCapacity) { $OpenAICompletionDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKUCapacity']) { $envVars['OpenAICompletionDeploymentSKUCapacity'] } else { 100 }
 
 # Create a new completion deployment for the Azure OpenAI account
 if (! $skipCreatingAzureOpenAICompletionDeployment) {
@@ -232,13 +258,13 @@ $OpenAIEndpoint = if ($useEnvFile -and $envVars['OpenAIEndpoint']) { $envVars['O
 $OpenAIKeys = $null
 $retries = 0
 
-while (($null -eq $OpenAIEndpoint   -or $null -eq $OpenAIKeys) -and $retries -lt 10) {
+while (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -lt 10) {
     if ($null -eq $OpenAIEndpoint) {
         $OpenAIEndpoint = az cognitiveservices account show --name $OpenAIAccount --resource-group $resourceGroup --query "properties.endpoint" -o tsv --only-show-errors
     }
 
     if ($null -eq $OpenAIKeys) {
-        $OpenAIKeys = az cognitiveservices account keys list --name $OpenAIAccount --resource-group $resourceGroup --query "{key1:key1, key2:key2}" -o tsv --only-show-errors
+        $OpenAIKeys = az cognitiveservices account keys list --name $OpenAIAccount --resource-group $resourceGroup --query "{ key1:key1, key2:key2 }" -o tsv --only-show-errors
     }
 
     if (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -eq 0) {
@@ -265,46 +291,46 @@ $OpenAIKeys2 = $key2
 # Write the .env file
 if ($updateEnvFile) {
     $envVars = [ordered]@{
-        "randomIdentifier" = if ($randomIdentifier) { "$randomIdentifier" } else { "" }
-        "location" = if ($location) { "`"$location`"" } else { "" }
-        "changeSubscription" = if ($changeSubscription) { "true" } else { "" }
-        "subscriptionName" = if ($subscriptionName) { "`"$subscriptionName`"" } else { "" }
-        "skipCreatingResourceGroup" = if ($skipCreatingResourceGroup) { "true" } else { "" }
-        "resourceGroup" = if ($resourceGroup) { "`"$resourceGroup`"" } else { "" }
+        "randomIdentifier"                            = if ($randomIdentifier) { "$randomIdentifier" } else { "" }
+        "location"                                    = if ($location) { "`"$location`"" } else { "" }
+        "changeSubscription"                          = if ($changeSubscription) { "true" } else { "" }
+        "subscriptionName"                            = if ($subscriptionName) { "`"$subscriptionName`"" } else { "" }
+        "skipCreatingResourceGroup"                   = if ($skipCreatingResourceGroup) { "true" } else { "" }
+        "resourceGroup"                               = if ($resourceGroup) { "`"$resourceGroup`"" } else { "" }
 
-        "skipCreatingCosmosDBCluster" = if ($skipCreatingCosmosDBCluster) { "true" } else { "" }
-        "skipCreatingCosmosDBPublicIPFirewallRule" = if ($skipCreatingCosmosDBPublicIPFirewallRule) { "true" } else { "" }
-        "cosmosCluster" = if ($cosmosCluster) { "`"$cosmosCluster`"" } else { "" }
-        "cosmosClusterLocation" = if ($cosmosClusterLocation) { "`"$cosmosClusterLocation`"" } else { "" }
-        "cosmosDbEndpoint" = if ($cosmosDbEndpoint) { "`"$cosmosDbEndpoint`"" } else { "" }
-        "cosmosClusterAdmin" = if ($cosmosClusterAdmin) { "`"$cosmosClusterAdmin`"" } else { "" }
-        "cosmosClusterPassword" = if ($cosmosClusterPassword) { "`"$cosmosClusterPassword`"" } else { "" }
-        "cosmosdbDatabase" = if ($cosmosdbDatabase) { "`"$cosmosdbDatabase`"" } else { "`"cosmicworks`"" }
+        "skipCreatingCosmosDBCluster"                 = if ($skipCreatingCosmosDBCluster) { "true" } else { "" }
+        "skipCreatingCosmosDBPublicIPFirewallRule"    = if ($skipCreatingCosmosDBPublicIPFirewallRule) { "true" } else { "" }
+        "cosmosCluster"                               = if ($cosmosCluster) { "`"$cosmosCluster`"" } else { "" }
+        "cosmosClusterLocation"                       = if ($cosmosClusterLocation) { "`"$cosmosClusterLocation`"" } else { "" }
+        "cosmosDbEndpoint"                            = if ($cosmosDbEndpoint) { "`"$cosmosDbEndpoint`"" } else { "" }
+        "cosmosClusterAdmin"                          = if ($cosmosClusterAdmin) { "`"$cosmosClusterAdmin`"" } else { "" }
+        "cosmosClusterPassword"                       = if ($cosmosClusterPassword) { "`"$cosmosClusterPassword`"" } else { "" }
+        "cosmosdbDatabase"                            = if ($cosmosdbDatabase) { "`"$cosmosdbDatabase`"" } else { "`"cosmicworks`"" }
 
-        "skipCreatingAzureOpenAIAccount" = if ($skipCreatingAzureOpenAIAccount) { "true" } else { "" }
-        "cognitiveServicesKind" = if ($cognitiveServicesKind) { "`"$cognitiveServicesKind`"" } else { "OpenAI" }
-        "OpenAIAccount" = if ($OpenAIAccount) { "`"$OpenAIAccount`"" } else { "" }
-        "OpenAIAccountLocation" = if ($OpenAIAccountLocation) { "`"$OpenAIAccountLocation`"" } else { "" }
-        "OpenAIAccountSKU" = if ($OpenAIAccountSKU) { "`"$OpenAIAccountSKU`"" } else { "`"s0`"" }
-        "OpenAIEndpoint" = if ($OpenAIEndpoint) { "`"$OpenAIEndpoint`"" } else { "" }
-        "OpenAIKey1" = if ($OpenAIKeys1) { "`"$OpenAIKeys1`"" } else { "" }
-        "OpenAIVersion" = if ($OpenAIVersion) { "`"$OpenAIVersion`"" } else { "`"2023-05-15`"" }
+        "skipCreatingAzureOpenAIAccount"              = if ($skipCreatingAzureOpenAIAccount) { "true" } else { "" }
+        "cognitiveServicesKind"                       = if ($cognitiveServicesKind) { "`"$cognitiveServicesKind`"" } else { "OpenAI" }
+        "OpenAIAccount"                               = if ($OpenAIAccount) { "`"$OpenAIAccount`"" } else { "" }
+        "OpenAIAccountLocation"                       = if ($OpenAIAccountLocation) { "`"$OpenAIAccountLocation`"" } else { "" }
+        "OpenAIAccountSKU"                            = if ($OpenAIAccountSKU) { "`"$OpenAIAccountSKU`"" } else { "`"s0`"" }
+        "OpenAIEndpoint"                              = if ($OpenAIEndpoint) { "`"$OpenAIEndpoint`"" } else { "" }
+        "OpenAIKey1"                                  = if ($OpenAIKeys1) { "`"$OpenAIKeys1`"" } else { "" }
+        "OpenAIVersion"                               = if ($OpenAIVersion) { "`"$OpenAIVersion`"" } else { "`"2023-05-15`"" }
 
-        "skipCreatingAzureOpenAIDeployment" = if ($skipCreatingAzureOpenAIDeployment) { "true" } else { "" }
-        "OpenAIDeploymentName" = if ($OpenAIDeploymentName) { "`"$OpenAIDeploymentName`"" } else { "" }
-        "OpenAIDeploymentModel" = if ($OpenAIDeploymentModel) { "`"$OpenAIDeploymentModel`"" } else { "" }
-        "OpenAIDeploymentModelFormat" = if ($OpenAIDeploymentModelFormat) { "`"$OpenAIDeploymentModelFormat`"" } else { "OpenAI" }
-        "OpenAIDeploymentModelVersion" = if ($OpenAIDeploymentModelVersion) { "`"$OpenAIDeploymentModelVersion`"" } else { "" }
-        "OpenAIDeploymentSKU" = if ($OpenAIDeploymentSKU) { "`"$OpenAIDeploymentSKU`"" } else { "`"Standard`"" }
-        "OpenAIDeploymentSKUCapacity" = if ($OpenAIDeploymentSKUCapacity) { "$OpenAIDeploymentSKUCapacity" } else { "100" }
+        "skipCreatingAzureOpenAIDeployment"           = if ($skipCreatingAzureOpenAIDeployment) { "true" } else { "" }
+        "OpenAIDeploymentName"                        = if ($OpenAIDeploymentName) { "`"$OpenAIDeploymentName`"" } else { "" }
+        "OpenAIDeploymentModel"                       = if ($OpenAIDeploymentModel) { "`"$OpenAIDeploymentModel`"" } else { "" }
+        "OpenAIDeploymentModelFormat"                 = if ($OpenAIDeploymentModelFormat) { "`"$OpenAIDeploymentModelFormat`"" } else { "OpenAI" }
+        "OpenAIDeploymentModelVersion"                = if ($OpenAIDeploymentModelVersion) { "`"$OpenAIDeploymentModelVersion`"" } else { "" }
+        "OpenAIDeploymentSKU"                         = if ($OpenAIDeploymentSKU) { "`"$OpenAIDeploymentSKU`"" } else { "`"Standard`"" }
+        "OpenAIDeploymentSKUCapacity"                 = if ($OpenAIDeploymentSKUCapacity) { "$OpenAIDeploymentSKUCapacity" } else { "100" }
 
         "skipCreatingAzureOpenAICompletionDeployment" = if ($skipCreatingAzureOpenAICompletionDeployment) { "true" } else { "" }
-        "OpenAICompletionDeploymentName" = if ($OpenAICompletionDeploymentName) { "`"$OpenAICompletionDeploymentName`"" } else { "" }
-        "OpenAICompletionDeploymentModel" = if ($OpenAICompletionDeploymentModel) { "`"$OpenAICompletionDeploymentModel`"" } else { "" }
-        "OpenAICompletionDeploymentModelFormat" = if ($OpenAICompletionDeploymentModelFormat) { "`"$OpenAICompletionDeploymentModelFormat`"" } else { "OpenAI" }
-        "OpenAICompletionDeploymentModelVersion" = if ($OpenAICompletionDeploymentModelVersion) { "`"$OpenAICompletionDeploymentModelVersion`"" } else { "" }
-        "OpenAICompletionDeploymentSKU" = if ($OpenAICompletionDeploymentSKU) { "`"$OpenAICompletionDeploymentSKU`"" } else { "`"Standard`"" }
-        "OpenAICompletionDeploymentSKUCapacity" = if ($OpenAICompletionDeploymentSKUCapacity) { "$OpenAICompletionDeploymentSKUCapacity" } else { "100" }
+        "OpenAICompletionDeploymentName"              = if ($OpenAICompletionDeploymentName) { "`"$OpenAICompletionDeploymentName`"" } else { "" }
+        "OpenAICompletionDeploymentModel"             = if ($OpenAICompletionDeploymentModel) { "`"$OpenAICompletionDeploymentModel`"" } else { "" }
+        "OpenAICompletionDeploymentModelFormat"       = if ($OpenAICompletionDeploymentModelFormat) { "`"$OpenAICompletionDeploymentModelFormat`"" } else { "OpenAI" }
+        "OpenAICompletionDeploymentModelVersion"      = if ($OpenAICompletionDeploymentModelVersion) { "`"$OpenAICompletionDeploymentModelVersion`"" } else { "" }
+        "OpenAICompletionDeploymentSKU"               = if ($OpenAICompletionDeploymentSKU) { "`"$OpenAICompletionDeploymentSKU`"" } else { "`"Standard`"" }
+        "OpenAICompletionDeploymentSKUCapacity"       = if ($OpenAICompletionDeploymentSKUCapacity) { "$OpenAICompletionDeploymentSKUCapacity" } else { "100" }
     }
 
     # We group the environment variables to improve readability and organization.
@@ -327,7 +353,8 @@ if ($updateEnvFile) {
         ""  # Add a blank line for the component group separation
     }
     
-    $output | Out-File -FilePath $envFilePath -Encoding utf8}
+    $output | Out-File -FilePath $envFilePath -Encoding utf8
+}
 
 # Output the resources
 Write-Host
@@ -336,19 +363,19 @@ Write-Host
 write-host "Random Identifier: $randomIdentifier"
 write-host 
 Write-Host "Change subscription status (skipped by default): " -NoNewline
-if (! $changeSubscription) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $changeSubscriptionError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
-if ($null -ne $changeSubscriptionError) { Write-Host "Change subscription error: "  -NoNewline  } if ($null -ne $changeSubscriptionError) { Write-Host $changeSubscriptionError -ForegroundColor Red}
+if (! $changeSubscription) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $changeSubscriptionError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($null -ne $changeSubscriptionError) { Write-Host "Change subscription error: "  -NoNewline } if ($null -ne $changeSubscriptionError) { Write-Host $changeSubscriptionError -ForegroundColor Red }
 Write-Host "Subscription name: $subscriptionName"
 Write-Host
 Write-Host "Resource group creation status: " -NoNewline
-if ($skipCreatingResourceGroup) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingResourceGroupError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
-if ($null -ne $CreatingResourceGroupError) { Write-Host "Resource group creation error: "  -NoNewline  } if ($null -ne $CreatingResourceGroupError) { Write-Host $CreatingResourceGroupError -ForegroundColor Red}
+if ($skipCreatingResourceGroup) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingResourceGroupError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($null -ne $CreatingResourceGroupError) { Write-Host "Resource group creation error: "  -NoNewline } if ($null -ne $CreatingResourceGroupError) { Write-Host $CreatingResourceGroupError -ForegroundColor Red }
 Write-Host "Resource group: $resourceGroup"
 Write-Host "Location: $location"
 Write-Host
 Write-Host "Cosmos DB creation status: " -NoNewline
-if ($skipCreatingCosmosDBCluster) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingCosmosDBClusterError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
-if ($null -ne $CreatingCosmosDBClusterError) { Write-Host "Cosmos DB creation error: "  -NoNewline  } if ($null -ne $CreatingCosmosDBClusterError) { Write-Host $CreatingCosmosDBClusterError -ForegroundColor Red}
+if ($skipCreatingCosmosDBCluster) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingCosmosDBClusterError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($null -ne $CreatingCosmosDBClusterError) { Write-Host "Cosmos DB creation error: "  -NoNewline } if ($null -ne $CreatingCosmosDBClusterError) { Write-Host $CreatingCosmosDBClusterError -ForegroundColor Red }
 Write-Host "Cosmos Cluster Name: $cosmosCluster"
 Write-Host "Cosmos Cluster Location: $cosmosClusterLocation"
 Write-Host "Cosmos Cluster Admin: $cosmosClusterAdmin"
@@ -357,8 +384,8 @@ Write-Host "Cosmos DB Endpoint: $cosmosDbEndpoint"
 Write-Host "Cosmos Database: $cosmosdbDatabase"
 Write-Host
 Write-Host "OpenAI account creation status: " -NoNewline
-if ($skipCreatingAzureOpenAIAccount) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAIAccountError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
-if ($null -ne $CreatingAzureOpenAIAccountError) { Write-Host "OpenAI account creation error: "  -NoNewline  } if ($null -ne $CreatingAzureOpenAIAccountError) { Write-Host $CreatingAzureOpenAIAccountError -ForegroundColor Red}
+if ($skipCreatingAzureOpenAIAccount) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAIAccountError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($null -ne $CreatingAzureOpenAIAccountError) { Write-Host "OpenAI account creation error: "  -NoNewline } if ($null -ne $CreatingAzureOpenAIAccountError) { Write-Host $CreatingAzureOpenAIAccountError -ForegroundColor Red }
 Write-Host "Cognitive Services Kind: $cognitiveServicesKind"
 Write-Host "OpenAI account: $OpenAIAccount"
 Write-Host "OpenAI account Location: $OpenAIAccountLocation"
@@ -368,7 +395,7 @@ Write-Host "OpenAI Key1: $OpenAIKeys1"
 Write-Host "OpenAI Key2: $OpenAIKeys2"
 write-host
 Write-Host "Open AI deployment creation status: " -NoNewline
-if ($skipCreatingAzureOpenAIDeployment) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAIDeploymentError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($skipCreatingAzureOpenAIDeployment) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAIDeploymentError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
 if ($null -ne $CreatingAzureOpenAIDeploymentError) { Write-Host "OpenAI deployment creation error - $CreatingAzureOpenAIDeploymentError" }
 Write-Host "OpenAI deployment name: $OpenAIDeploymentName"
 write-host "OpenAI deployment model: $OpenAIDeploymentModel"
@@ -378,7 +405,7 @@ Write-Host "OpenAI deployment SKU: $OpenAIDeploymentSKU"
 Write-Host "OpenAI deployment SKU Capacity: $OpenAIDeploymentSKUCapacity"
 write-host
 Write-Host "Open AI completion deployment creation status: " -NoNewline
-if ($skipCreatingAzureOpenAICompletionDeployment) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAICompletionDeploymentError ){ Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
+if ($skipCreatingAzureOpenAICompletionDeployment) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAICompletionDeploymentError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
 if ($null -ne $CreatingAzureOpenAICompletionDeploymentError) { Write-Host "OpenAI completion deployment creation error - $CreatingAzureOpenAICompletionDeploymentError" }
 Write-Host "OpenAI completion deployment name: $OpenAICompletionDeploymentName"
 write-host "OpenAI completion deployment model: $OpenAICompletionDeploymentModel"

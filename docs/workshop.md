@@ -21,7 +21,7 @@ navigation_levels: 3
 
 ## Building an AI copilot using vCore-based Azure Cosmos DB for MongoDB
 
-In this lab, you use Azure OpenAI to create embeddings for vCore-based Azure Cosmos DB for MongoDB documents, establishing your AI copilot for advanced data exploration. You build a vector index from these embeddings, allowing you to create vector searches. The vector searches involves generating an embedding for user prompts, using those user prompt embeddings to find similar documents in the database through a vector search, and enhancing the search results deploying an Azure OpenAI GPT-3.5 chat. This process illustrates a Retrieval-Augmented Generation (RAG) approach, mixing AI with database technologies to refine search results and responses.
+In this lab, you use Azure OpenAI to create embeddings for vCore-based Azure Cosmos DB for MongoDB documents, establishing your AI copilot for advanced data exploration. You build a vector index from these embeddings, allowing you to create vector searches. The vector searches involves generating an embedding for user prompts, using those user prompt embeddings to find similar documents in the database through a vector search, and enhancing the search results deploying an Azure OpenAI GPT-4o chat. This process illustrates a Retrieval-Augmented Generation (RAG) approach, mixing AI with database technologies to refine search results and responses.
 
 ### Objectives
 
@@ -29,9 +29,9 @@ In this lab, you use Azure OpenAI to create embeddings for vCore-based Azure Cos
 - Import data into vCore-based Azure Cosmos DB for MongoDB, generating embeddings for *category* and *name* fields of each product during the process.
 - Create a Vector index on the generated vector column.
 - Perform vector searches using prompts and display the closest matching products.
-- Use GPT-3.5 to enhance vector search results, enabling your AI copilot to provide more detailed insights.
+- Use GPT-4o to enhance vector search results, enabling your AI copilot to provide more detailed insights.
 
-These objectives showcase the practical use of the Retrieval-Augmented Generation (RAG) approach, combining vector search accuracy with the depth provided by GPT-3.5 insights.
+These objectives showcase the practical use of the Retrieval-Augmented Generation (RAG) approach, combining vector search accuracy with the depth provided by GPT-4o insights.
 
 ### Build your own lab environment
 
@@ -441,7 +441,7 @@ This function first drops the index if it already exists, then creates a new IVF
 
 ## Perform vector searches
 
-It's time to perform vector searches using the generated embeddings and vector indexes. Later, you enhance the vector search results with GPT-3.5.
+It's time to perform vector searches using the generated embeddings and vector indexes. Later, you enhance the vector search results with GPT-4o.
 
 ### Update the runVectorSearch function
 
@@ -589,7 +589,7 @@ The interesting part of this function is that to create the embeddings of the us
 
 ---
 
-## Integrate GPT-3.5 for enhanced search results
+## Integrate GPT-4o for enhanced search results
 
 Vector search results can be powerful, but they might require extra coding to fully interpret and utilize the results. To address this issue, you can integrate GPT-3 to provide more detailed, human-readable insights from the vector search results.
 
@@ -672,13 +672,13 @@ Setting up this function, just like the ***runVectorSearch*** function, readies 
 
 </details>
 
-Like the *runVectorSearch* function, this function asks you for your prompt to run against the vector index. However, after obtaining vector search results, this function further call a function to process those results with GPT-3.5 to generate more detailed, human-readable insights.
+Like the *runVectorSearch* function, this function asks you for your prompt to run against the vector index. However, after obtaining vector search results, this function further call a function to process those results with GPT-4o to generate more detailed, human-readable insights.
 
 ### Update the generateCompletion function
 
-Using GPT-3.5 to enhance search results brings our RAG process full circle. It turns basic data searches into detailed, interactive conversations, demonstrating the power of combining database technology with AI.
+Using GPT-4o to enhance search results brings our RAG process full circle. It turns basic data searches into detailed, interactive conversations, demonstrating the power of combining database technology with AI.
 
-Let's turn those vector search results into more comprehensive and understandable responses using GPT-3.5.
+Let's turn those vector search results into more comprehensive and understandable responses using GPT-4o.
 
 - In VS Code, open the file **./[language]/SearchComponents/completion** (with a .js or .py extension for the file's respective language).
 - In the **generateCompletion** function, replace the line with the comment *Replace this line with the lab's code* with the provided code snippet, and **Save**.
@@ -756,7 +756,7 @@ Let's turn those vector search results into more comprehensive and understandabl
 
 This function has three sets of prompts. The first is a system prompt (***systemPrompt***) that sets the context for the AI, or in other words, who is the AI supposed to be, and what parameters/rules it should follow. The second is the user's input (**userInput***), which is the question or prompt we asked. The third is the an array of results from the vector search (**prompt**) on that same previous question or prompt we asked. It then calls the Azure OpenAI Chat Completions function to generate completions based on those prompts.
 
-Moving from conducting vector searches to improving results with GPT-3.5 chat highlights the RAG method, seamlessly integrating precise data search with AI-driven conversational insights.
+Moving from conducting vector searches to improving results with GPT-4o chat highlights the RAG method, seamlessly integrating precise data search with AI-driven conversational insights.
 
 ## Running the Application
 
@@ -776,11 +776,8 @@ After completing the setup and configuration steps, you're now ready to explore 
 
 ```powershell
 cd ./python
-py -m pip install -v "pymongo==4.6.2"
-py -m pip install -v "openai==1.13.3" 
-py -m pip install -v "tenacity==9.0.0"
-py -m pip install -v "azure-storage-blob==12.23.1"
-py load-and-vectorize-data.py
+python -m pip install -r requirements.txt
+python load-and-vectorize-data.py
 ```
 
 </details>
@@ -818,14 +815,14 @@ npm start
     Review the results of this query to help you understand how vector search results, while powerful, might require extra coding to fully interpret and utilize the results.
 
 5. **Conduct GPT-3 Enhanced Vector Search**:
-   - After evaluating the results from *Option 3*, proceed with **Option 4** for a GPT-3.5 enhanced vector search using the same query ***What are your bikes' colors***. This step demonstrates how integrating with GPT-3.5 can provide richer and more human-readable insights from the vector search results. GPT-3.5 makes the data more accessible and understandable without the need for further complex coding.
+   - After evaluating the results from *Option 3*, proceed with **Option 4** for a GPT-4o enhanced vector search using the same query ***What are your bikes' colors***. This step demonstrates how integrating with GPT-4o can provide richer and more human-readable insights from the vector search results. GPT-4o makes the data more accessible and understandable without the need for further complex coding.
 
 6. **Experiment with Queries**: Utilize the following queries to test the system's response and then, using option 4, run as many queries as you can think of:
     - What is the biggest bike you sell?
     - Can you recommend some accessories for my bike?
     - I need some biking clothing, what do you have?
 
-Even running the same query multiple times can yield different results, demonstrating the power of GPT-3.5 in providing more detailed insights.
+Even running the same query multiple times can yield different results, demonstrating the power of GPT-4o in providing more detailed insights.
 
 ---
 
@@ -847,6 +844,6 @@ This cleanup process helps maintain your Azure account organized and free from u
 
 # Conclusion
 
-In this lab, you employed Azure OpenAI to generate embeddings for vCore-based Azure Cosmos DB for MongoDB documents and built a vector index for in-depth searches, effectively integrating these tools as your AI copilot. By transforming user prompts into embeddings to search for similar documents in the database, and then enhancing these search outcomes using GPT-3.5 chat from Azure OpenAI, you effectively demonstrated a Retrieval-Augmented Generation (RAG) approach. This step shows how integrating AI with database searches can refine the relevance and depth of query results.
+In this lab, you employed Azure OpenAI to generate embeddings for vCore-based Azure Cosmos DB for MongoDB documents and built a vector index for in-depth searches, effectively integrating these tools as your AI copilot. By transforming user prompts into embeddings to search for similar documents in the database, and then enhancing these search outcomes using GPT-4o chat from Azure OpenAI, you effectively demonstrated a Retrieval-Augmented Generation (RAG) approach. This step shows how integrating AI with database searches can refine the relevance and depth of query results.
 
 This lab not only guided you through the technical steps of implementing vector search and AI enhancements. The lab also illustrated the powerful capabilities of the Retrieval-Augmented Generation (RAG) approach in creating more dynamic, intelligent, and user-friendly data retrieval systems.
