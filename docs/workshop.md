@@ -38,6 +38,7 @@ These objectives showcase the practical use of the Retrieval-Augmented Generatio
 If you need to build your own lab environment, you need the following components and resource access.
 
 - **Visual Studio Code**: Ensure Visual Studio Code is installed on your machine.
+- **Docker**: Ensure Docker is installed and running in order to use dev containers.
 - **Azure Subscription**: Have access to an Azure Subscription for creating and using the necessary resources:
   - **vCore-based Azure Cosmos DB for MongoDB**: Access to create or use an existing a vCore-based Azure Cosmos DB for MongoDB account.
   - **Azure OpenAI Account**: Access to create or use an existing Azure OpenAI account.
@@ -60,7 +61,7 @@ To support your AI copilot, you need access to the following Azure resources for
 - vCore-based Azure Cosmos DB for MongoDB account
 - Azure OpenAI account, including deployments for embeddings and completions
 
-You can create these resources via the *Azure portal* or use the ***create-azure-resources.ps1*** PowerShell script with the ***.env** file. Don't use existing production resources for this lab or any lab.
+You can create these resources via the *Azure portal* or use the ***create-azure-resources.ps1*** PowerShell script with the ***.env*** file. Don't use existing production resources for this lab or any lab.
 
 ### Use the .env file
 
@@ -70,7 +71,7 @@ This file is both used to retrieve and store the necessary environment variables
 
 If you already have an existing Resource Group, a vCore-based Azure Cosmos DB for MongoDB account, or an Azure OpenAI account that you would like to use, just fill in those values in the .env file and set the skip create option for that resource to **true**. By default, the *create-azure-resources.ps1* script uses this file to retrieve the necessary environment variables. The *create-azure-resources.ps1* script populates the environment variables with default values if not specified in the .env file.
 
-To learn more about the ***.env*** file and its parameters, review the [***.env*** file documentation](https://github.com/lgmorand/minihack-cosmos-vector/docs/envfile.md).
+To learn more about the ***.env*** file and its parameters, review the [***.env*** file documentation](https://github.com/lgmorand/minihack-cosmos-vector/blob/main/docs/envfile.md).
 
 ### Use the create-azure-resources.ps1 script
 
@@ -96,7 +97,7 @@ The script has a rich set of parameters to help you customize the resources to b
 
 </div>
 
-To learn more about the PowerShell script and its parameters, review the [***create-azure-resources.ps1*** documentation](https://github.com/lgmorand/minihack-cosmos-vector/docs/powershell-script.md).
+To learn more about the PowerShell script and its parameters, review the [***create-azure-resources.ps1*** documentation](https://github.com/lgmorand/minihack-cosmos-vector/blob/main/docs/powershell-script.md).
 
 <div class="info" data-title="Note">
 
