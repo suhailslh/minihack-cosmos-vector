@@ -606,7 +606,7 @@ The interesting part of this function is that to create the embeddings of the us
 
 ## Integrate GPT-4o for enhanced search results
 
-Vector search results can be powerful, but they might require extra coding to fully interpret and utilize the results. To address this issue, you can integrate GPT-3 to provide more detailed, human-readable insights from the vector search results.
+Vector search results can be powerful, but they might require extra coding to fully interpret and utilize the results. To address this issue, you can integrate gpt-4o to provide more detailed, human-readable insights from the vector search results.
 
 ### Update the runGPTSearch function
 
@@ -786,6 +786,8 @@ After completing the setup and configuration steps, you're now ready to explore 
   
 1. **Launch the Application**: Navigate to the root directory of your project in the integrated terminal within Visual Studio Code. To start the application, enter the following commands.
 
+To run the application, ensure you have either **Python** or **Node.js** installed locally. Alternatively, you can use the provided **devcontainer** for a pre-configured environment (ensure docker is installed and running). By default, **Python** is enabled in the devcontainer. If you wish to use **Node.js** instead, comment out the Python section and uncomment the Node.js section in the **./.devcontainer/devcontainer.json** configuration file.
+
 <details>
 <summary>Python</summary>
 
@@ -803,7 +805,6 @@ python load-and-vectorize-data.py
 ```powershell
 cd ./node.js
 npm install
-npm install openai
 npm start
 ```
 
@@ -813,7 +814,7 @@ npm start
     - **Option 1**: Download data from Azure Blob Storage, load it into the database, and create the vector index.
     - **Option 2**: Load local data into MongoDB and create vector index.
     - **Option 3**: Run a Vector Search.
-    - **Option 4**: Conduct a GPT-3 enhanced vector search.
+    - **Option 4**: Conduct a gpt-4o enhanced vector search.
 
 3. **Prepare your database**: Choose either option 1 or 2 to load data into the database and create the vector index. This step is essential for performing searches.
 
@@ -829,7 +830,7 @@ npm start
 
     Review the results of this query to help you understand how vector search results, while powerful, might require extra coding to fully interpret and utilize the results.
 
-5. **Conduct GPT-3 Enhanced Vector Search**:
+5. **Conduct gpt-4o Enhanced Vector Search**:
    - After evaluating the results from *Option 3*, proceed with **Option 4** for a GPT-4o enhanced vector search using the same query ***What are your bikes' colors***. This step demonstrates how integrating with GPT-4o can provide richer and more human-readable insights from the vector search results. GPT-4o makes the data more accessible and understandable without the need for further complex coding.
 
 6. **Experiment with Queries**: Utilize the following queries to test the system's response and then, using option 4, run as many queries as you can think of:

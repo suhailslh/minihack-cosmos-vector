@@ -69,7 +69,7 @@ The **.env** file contains key-value pairs, each defining a specific configurati
 | **OpenAICompletionDeploymentModelFormat** | The model format for the Cognitive Services completion deployment. Defaults to **OpenAI**. | **OpenAI** |
 | **OpenAICompletionDeploymentSKUCapacity** | The SKU capacity for the Azure OpenAI completion deployment. Defaults to **100** | **100** |
 | **OpenAICompletionDeploymentModelVersion** | The model version for the Azure OpenAI completion deployment. | **0301** |
-| **OpenAICompletionDeploymentModel** | The model name for the Azure OpenAI completion deployment. | **gpt-3.5-turbo** |
+| **OpenAICompletionDeploymentModel** | The model name for the Azure OpenAI completion deployment. | **gpt-4o** |
 
 ### Azure Storage account
 

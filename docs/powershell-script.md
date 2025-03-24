@@ -68,7 +68,7 @@ The script accepts several parameters to customize the deployment process. The f
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
 | **OpenAICompletionDeploymentName** | string | No | "msdocs-account-openai-completion-$randomIdentifier" | The name of the Azure OpenAI completion deployment. Generated using a random identifier if not specified. |
-| **OpenAICompletionDeploymentModel** | string | No | "gpt-3.5-turbo" | The model name for the Azure OpenAI completion deployment. Defaults to "gpt-3.5-turbo" if not specified. |
+| **OpenAICompletionDeploymentModel** | string | No | "gpt-4o" | The model name for the Azure OpenAI completion deployment. Defaults to "gpt-4o" if not specified. |
 | **OpenAICompletionDeploymentModelVersion** | string | No | "0301" | The model version for the Azure OpenAI completion deployment. Defaults to "0301" if not specified. |
 | **OpenAICompletionDeploymentSKU** | String | No | "Standard" | The SKU for the Azure OpenAI completion deployment. |
 | **OpenAICompletionDeploymentSKUCapacity** | Int32 | No | 100 | The SKU capacity for the Azure OpenAI completion deployment. |
