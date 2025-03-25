@@ -184,6 +184,18 @@ $OpenAIAccount = if ($OpenAIAccount) { $OpenAIAccount } elseif ($useEnvFile -and
 $OpenAIAccountLocation = if ($OpenAIAccountLocation) { $OpenAIAccountLocation } elseif ($useEnvFile -and $envVars['OpenAIAccountLocation']) { $envVars['OpenAIAccountLocation'] } else { $location } 
 $OpenAIAccountSKU = if ($OpenAIAccountSKU) { $OpenAIAccountSKU } elseif ($useEnvFile -and $envVars['OpenAIAccountSKU']) { $envVars['OpenAIAccountSKU'] } else { "s0" }
 
+$OpenAIKeys1 = if ($useEnvFile -and $envVars['OpenAIKey1']) { $envVars['OpenAIKey1'] } else { '' }
+$OpenAIEndpoint = if ($useEnvFile -and $envVars['OpenAIEndpoint']) { $envVars['OpenAIEndpoint'] } else { ''}
+
+$OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "lab-account-openai-deployment" }
+$OpenAIDeploymentModel = if ($OpenAIDeploymentModel) { $OpenAIDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
+$OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) { $OpenAIDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
+
+$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "lab-account-openai-completion" }
+$OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) { $OpenAICompletionDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-4o" }
+$OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) { $OpenAICompletionDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "2024-08-06" }
+
+
 # Create an Azure OpenAI account
 if (! $skipCreatingAzureOpenAIAccount) {
     Write-Host
@@ -200,93 +212,94 @@ if (! $skipCreatingAzureOpenAIAccount) {
         $CreatingAzureOpenAIAccountError = $_.Exception.Message
         Write-Host "Error creating the OpenAI account $OpenAIAccount - $CreatingAzureOpenAIAccountError"
     }
-}
+    
+    $OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "lab-account-openai-deployment" }
+    $OpenAIDeploymentModel = if ($OpenAIDeploymentModel) { $OpenAIDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
+    $OpenAIDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAIDeploymentModelFormat']) { $envVars['OpenAIDeploymentModelFormat'] } else { "OpenAI" }
+    $OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) { $OpenAIDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
+    $OpenAIDeploymentSKU = if ($OpenAIDeploymentSKU) { $OpenAIDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKU']) { $envVars['OpenAIDeploymentSKU'] } else { "Standard" }
+    $OpenAIDeploymentSKUCapacity = if ($OpenAIDeploymentSKUCapacity) { $OpenAIDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKUCapacity']) { $envVars['OpenAIDeploymentSKUCapacity'] } else { 100 }
 
-$OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "lab-account-openai-deployment" }
-$OpenAIDeploymentModel = if ($OpenAIDeploymentModel) { $OpenAIDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
-$OpenAIDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAIDeploymentModelFormat']) { $envVars['OpenAIDeploymentModelFormat'] } else { "OpenAI" }
-$OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) { $OpenAIDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
-$OpenAIDeploymentSKU = if ($OpenAIDeploymentSKU) { $OpenAIDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKU']) { $envVars['OpenAIDeploymentSKU'] } else { "Standard" }
-$OpenAIDeploymentSKUCapacity = if ($OpenAIDeploymentSKUCapacity) { $OpenAIDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAIDeploymentSKUCapacity']) { $envVars['OpenAIDeploymentSKUCapacity'] } else { 100 }
+    # Create a new deployment for the Azure OpenAI account
+    if (! $skipCreatingAzureOpenAIDeployment) {
+        Write-Host
+        Write-Host "Creating OpenAI deployment $OpenAIDeploymentName in $OpenAIAccountLocation..."
+        Write-Host
 
-# Create a new deployment for the Azure OpenAI account
-if (! $skipCreatingAzureOpenAIDeployment) {
-    Write-Host
-    Write-Host "Creating OpenAI deployment $OpenAIDeploymentName in $OpenAIAccountLocation..."
-    Write-Host
-
-    try {
-        $output = az cognitiveservices account deployment create --name $OpenAIAccount --resource-group $resourceGroup --deployment-name $OpenAIDeploymentName --model-name $OpenAIDeploymentModel --model-version $OpenAIDeploymentModelVersion --model-format $OpenAIDeploymentModelFormat --sku-capacity $OpenAIDeploymentSKUCapacity --sku-name $OpenAIDeploymentSKU --only-show-errors 
-        if ($LASTEXITCODE -ne 0) {
-            throw $output
+        try {
+            $output = az cognitiveservices account deployment create --name $OpenAIAccount --resource-group $resourceGroup --deployment-name $OpenAIDeploymentName --model-name $OpenAIDeploymentModel --model-version $OpenAIDeploymentModelVersion --model-format $OpenAIDeploymentModelFormat --sku-capacity $OpenAIDeploymentSKUCapacity --sku-name $OpenAIDeploymentSKU --only-show-errors 
+            if ($LASTEXITCODE -ne 0) {
+                throw $output
+            }
+        }
+        catch {
+            $CreatingAzureOpenAIDeploymentError = $_.Exception.Message
+            Write-Host "Error creating the OpenAI deployment $OpenAIDeploymentName - $CreatingAzureOpenAIDeploymentError"
         }
     }
-    catch {
-        $CreatingAzureOpenAIDeploymentError = $_.Exception.Message
-        Write-Host "Error creating the OpenAI deployment $OpenAIDeploymentName - $CreatingAzureOpenAIDeploymentError"
-    }
-}
 
-$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "lab-account-openai-completion" }
-$OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) { $OpenAICompletionDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-4o" }
-$OpenAICompletionDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelFormat']) { $envVars['OpenAICompletionDeploymentModelFormat'] } else { "OpenAI" }
-$OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) { $OpenAICompletionDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "2024-08-06" }
-$OpenAICompletionDeploymentSKU = if ($OpenAICompletionDeploymentSKU) { $OpenAICompletionDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKU']) { $envVars['OpenAICompletionDeploymentSKU'] } else { "Standard" }
-$OpenAICompletionDeploymentSKUCapacity = if ($OpenAICompletionDeploymentSKUCapacity) { $OpenAICompletionDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKUCapacity']) { $envVars['OpenAICompletionDeploymentSKUCapacity'] } else { 100 }
+    $OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "lab-account-openai-completion" }
+    $OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) { $OpenAICompletionDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-4o" }
+    $OpenAICompletionDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelFormat']) { $envVars['OpenAICompletionDeploymentModelFormat'] } else { "OpenAI" }
+    $OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) { $OpenAICompletionDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "2024-08-06" }
+    $OpenAICompletionDeploymentSKU = if ($OpenAICompletionDeploymentSKU) { $OpenAICompletionDeploymentSKU } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKU']) { $envVars['OpenAICompletionDeploymentSKU'] } else { "Standard" }
+    $OpenAICompletionDeploymentSKUCapacity = if ($OpenAICompletionDeploymentSKUCapacity) { $OpenAICompletionDeploymentSKUCapacity } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentSKUCapacity']) { $envVars['OpenAICompletionDeploymentSKUCapacity'] } else { 100 }
 
-# Create a new completion deployment for the Azure OpenAI account
-if (! $skipCreatingAzureOpenAICompletionDeployment) {
-    Write-Host
-    Write-Host "Creating OpenAI completetion deployment $OpenAICompletionDeploymentName in $OpenAIAccountLocation..."
-    Write-Host
+    # Create a new completion deployment for the Azure OpenAI account
+    if (! $skipCreatingAzureOpenAICompletionDeployment) {
+        Write-Host
+        Write-Host "Creating OpenAI completetion deployment $OpenAICompletionDeploymentName in $OpenAIAccountLocation..."
+        Write-Host
 
-    try {
-        $output = az cognitiveservices account deployment create --name $OpenAIAccount --resource-group $resourceGroup --deployment-name $OpenAICompletionDeploymentName --model-name $OpenAICompletionDeploymentModel --model-version $OpenAICompletionDeploymentModelVersion --model-format $OpenAICompletionDeploymentModelFormat --sku-capacity $OpenAICompletionDeploymentSKUCapacity --sku-name $OpenAICompletionDeploymentSKU --only-show-errors 
-        if ($LASTEXITCODE -ne 0) {
-            throw $output
+        try {
+            $output = az cognitiveservices account deployment create --name $OpenAIAccount --resource-group $resourceGroup --deployment-name $OpenAICompletionDeploymentName --model-name $OpenAICompletionDeploymentModel --model-version $OpenAICompletionDeploymentModelVersion --model-format $OpenAICompletionDeploymentModelFormat --sku-capacity $OpenAICompletionDeploymentSKUCapacity --sku-name $OpenAICompletionDeploymentSKU --only-show-errors 
+            if ($LASTEXITCODE -ne 0) {
+                throw $output
+            }
+        }
+        catch {
+            $CreatingAzureOpenAICompletionDeploymentError = $_.Exception.Message
+            Write-Host "Error creating the OpenAI completion deployment $OpenAICompletionDeploymentName - $CreatingAzureOpenAICompletionDeploymentError"
         }
     }
-    catch {
-        $CreatingAzureOpenAICompletionDeploymentError = $_.Exception.Message
-        Write-Host "Error creating the OpenAI completion deployment $OpenAICompletionDeploymentName - $CreatingAzureOpenAICompletionDeploymentError"
+
+    # Get the keys and endpoint for the OpenAI accountIn case there's a delay in the deployment creation. 
+    # We'll retry a few times to get the keys and endpoint, waiting 30 seconds at a time for up to 5 minutes
+
+    $OpenAIEndpoint = if ($useEnvFile -and $envVars['OpenAIEndpoint']) { $envVars['OpenAIEndpoint'] } else { az cognitiveservices account show --name $OpenAIAccount --resource-group $resourceGroup --query "endpoint" -o tsv  --only-show-errors }
+    $OpenAIKeys = $null
+    $retries = 0
+
+    while (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -lt 10) {
+        if ($null -eq $OpenAIEndpoint) {
+            $OpenAIEndpoint = az cognitiveservices account show --name $OpenAIAccount --resource-group $resourceGroup --query "properties.endpoint" -o tsv --only-show-errors
+        }
+
+        if ($null -eq $OpenAIKeys) {
+            $OpenAIKeys = az cognitiveservices account keys list --name $OpenAIAccount --resource-group $resourceGroup --query "{ key1:key1, key2:key2 }" -o tsv --only-show-errors
+        }
+
+        if (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -eq 0) {
+            Write-Host
+            Write-Host "Waiting up to 5 minutes for OpenAI account to provide keys and endpoint..."
+            Write-Host
+        }
+
+        Start-Sleep -Seconds 30
+        $retries++
     }
-}
 
-# Get the keys and endpoint for the OpenAI accountIn case there's a delay in the deployment creation. 
-# We'll retry a few times to get the keys and endpoint, waiting 30 seconds at a time for up to 5 minutes
-$OpenAIEndpoint = if ($useEnvFile -and $envVars['OpenAIEndpoint']) { $envVars['OpenAIEndpoint'] } else { az cognitiveservices account show --name $OpenAIAccount --resource-group $resourceGroup --query "endpoint" -o tsv  --only-show-errors }
-$OpenAIKeys = $null
-$retries = 0
-
-while (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -lt 10) {
-    if ($null -eq $OpenAIEndpoint) {
-        $OpenAIEndpoint = az cognitiveservices account show --name $OpenAIAccount --resource-group $resourceGroup --query "properties.endpoint" -o tsv --only-show-errors
-    }
-
-    if ($null -eq $OpenAIKeys) {
-        $OpenAIKeys = az cognitiveservices account keys list --name $OpenAIAccount --resource-group $resourceGroup --query "{ key1:key1, key2:key2 }" -o tsv --only-show-errors
-    }
-
-    if (($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) -and $retries -eq 0) {
+    if ($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) {
         Write-Host
-        Write-Host "Waiting up to 5 minutes for OpenAI account to provide keys and endpoint..."
+        Write-Host "Failed to retrieve OpenAI endpoint or keys after 5 minutes, please retrieve them manually from the Azure portal and update the .env file"
         Write-Host
     }
 
-    Start-Sleep -Seconds 30
-    $retries++
+    $OpenAIEndpoint = if ($OpenAIEndpoint) { $OpenAIEndpoint } elseif ($useEnvFile -and $envVars['OpenAIEndpoint']) { $envVars['OpenAIEndpoint'] } else { "" }
+    $key1, $key2 = $OpenAIkeys -split "`t"
+
+    $OpenAIKeys1 = if ($useEnvFile -and $envVars['OpenAIKey1']) { $envVars['OpenAIKey1'] } else { $key1 }
 }
-
-if ($null -eq $OpenAIEndpoint -or $null -eq $OpenAIKeys) {
-    Write-Host
-    Write-Host "Failed to retrieve OpenAI endpoint or keys after 5 minutes, please retrieve them manually from the Azure portal and update the .env file"
-    Write-Host
-}
-
-$key1, $key2 = $OpenAIkeys -split "`t"
-
-$OpenAIKeys1 = if ($useEnvFile -and $envVars['OpenAIKey1']) { $envVars['OpenAIKey1'] } else { $key1 }
-$OpenAIKeys2 = $key2
 
 # Write the .env file
 if ($updateEnvFile) {
@@ -392,7 +405,6 @@ Write-Host "OpenAI account Location: $OpenAIAccountLocation"
 Write-Host "OpenAI account SKU: $OpenAIAccountSKU"
 Write-Host "OpenAI Endpoint: $OpenAIEndpoint"
 Write-Host "OpenAI Key1: $OpenAIKeys1"
-Write-Host "OpenAI Key2: $OpenAIKeys2"
 write-host
 Write-Host "Open AI deployment creation status: " -NoNewline
 if ($skipCreatingAzureOpenAIDeployment) { Write-Host "Skipped" -ForegroundColor Yellow } elseif (  $null -ne $CreatingAzureOpenAIDeploymentError ) { Write-Host "Failed" -ForegroundColor Red } else { Write-Host "Success" -ForegroundColor Green }
