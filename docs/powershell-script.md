@@ -19,7 +19,7 @@ The script accepts several parameters to customize the deployment process. The f
 | **randomIdentifier** | Int32 | No | Get-Random | A random identifier to make the resource names unique. |
 | **location** | string | No | "eastus" | The location for the deployment. Defaults to "eastus" if not specified. |
 | **subscriptionName** | string | No | Output of **(az account show --query name -o tsv)** | The name of the Azure subscription for the deployment. Defaults to the current Azure subscription name. |
-| **resourceGroup** | string | No | "msdocs-cosmosdb-rg-$randomIdentifier" | The name of the resource group. Generated using a random identifier if not specified. |
+| **resourceGroup** | string | No | "lab-rg-$randomIdentifier" | The name of the resource group. Generated using a random identifier if not specified. |
 
 ### Skip resource creation
 
@@ -39,7 +39,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **cosmosCluster** | string | No | "msdocs-account-cosmos-cluster-$randomIdentifier" | The name of the Cosmos DB cluster. Generated using a random identifier if not specified. |
+| **cosmosCluster** | string | No | "lab-account-cosmos-cluster-$randomIdentifier" | The name of the Cosmos DB cluster. Generated using a random identifier if not specified. |
 | **cosmosClusterLocation** | string | No | **location** | The location for the Cosmos DB cluster. |
 | **cosmosClusterAdmin** | string | No | "clusteradmin$randomIdentifier" | The admin username for the Cosmos DB cluster. Generated using a random identifier if not specified. |
 | **cosmosClusterPassword** | SecureString | No | Randomly generated 16-character password | The password for the Cosmos DB cluster. Generated if not specified. |
@@ -49,7 +49,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **OpenAIAccount** | string | No | "msdocs-account-openai-$randomIdentifier" | The name of the Azure OpenAI account. Generated using a random identifier if not specified. |
+| **OpenAIAccount** | string | No | "lab-account-openai-$randomIdentifier" | The name of the Azure OpenAI account. Generated using a random identifier if not specified. |
 | **OpenAIAccountLocation** | string | No | **location** | The location for the Azure OpenAI account. |
 | **OpenAIAccountSKU** | string | No | "s0" | The SKU for the Azure OpenAI account. |
 
@@ -57,7 +57,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **OpenAIDeploymentName** | string | No | "msdocs-account-openai-deployment-$randomIdentifier" | The name of the Azure OpenAI deployment. Generated using a random identifier if not specified. |
+| **OpenAIDeploymentName** | string | No | "lab-account-openai-deployment" | The name of the Azure OpenAI deployment. Generated using a random identifier if not specified. |
 | **OpenAIDeploymentModel** | string | No | "text-embedding-ada-002" | The model name for the Azure OpenAI deployment. Defaults to "text-embedding-ada-002" if not specified. |
 | **OpenAIDeploymentModelVersion** | string | No | "2" | The model version for the Azure OpenAI deployment. Defaults to "2" if not specified. |
 | **OpenAIDeploymentSKU** | String | No | "Standard" | The SKU for the Azure OpenAI deployment. |
@@ -67,7 +67,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **OpenAICompletionDeploymentName** | string | No | "msdocs-account-openai-completion-$randomIdentifier" | The name of the Azure OpenAI completion deployment. Generated using a random identifier if not specified. |
+| **OpenAICompletionDeploymentName** | string | No | "labs-account-openai-completion" | The name of the Azure OpenAI completion deployment. Generated using a random identifier if not specified. |
 | **OpenAICompletionDeploymentModel** | string | No | "gpt-4o" | The model name for the Azure OpenAI completion deployment. Defaults to "gpt-4o" if not specified. |
 | **OpenAICompletionDeploymentModelVersion** | string | No | "0301" | The model version for the Azure OpenAI completion deployment. Defaults to "0301" if not specified. |
 | **OpenAICompletionDeploymentSKU** | String | No | "Standard" | The SKU for the Azure OpenAI completion deployment. |
@@ -77,7 +77,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **storageAccountName** | string | No | "msdocsstorage$randomIdentifier" | The name of the storage account. Generated using a random identifier if not specified. |
+| **storageAccountName** | string | No | "labstorage$randomIdentifier" | The name of the storage account. Generated using a random identifier if not specified. |
 | **storageAccountLocation** | string | No | **location** | The location for the storage account. |
 | **storageAccountSKU** | string | No | "Standard_LRS" | The SKU for the storage account. |
 | **storageAccountKind** | string | No | "StorageV2" | The kind of storage account. |
@@ -86,7 +86,7 @@ The script accepts several parameters to customize the deployment process. The f
 
 | Parameter Name | Data Type | Mandatory | Default Value | Description |
 |----------------|-----------|-----------|---------------|-------------|
-| **logAnalyticsWorkspaceName** | string | No | "msdocs-log-analytics-workspace-$randomIdentifier" | The name of the Log Analytics workspace. Generated using a random identifier if not specified. |
+| **logAnalyticsWorkspaceName** | string | No | "lab-log-analytics-workspace-$randomIdentifier" | The name of the Log Analytics workspace. Generated using a random identifier if not specified. |
 | **logAnalyticsWorkspaceLocation** | string | No | **location** | The location for the Log Analytics workspace. |
 
 ## Determinate variable value precedence

@@ -14,7 +14,7 @@ param (
     [bool]$skipCreatingCosmosDBPublicIPFirewallRule = $false, # Skip creating the Cosmos DB public IP firewall rule
     [bool]$skipCreatingAzureOpenAIAccount = $false, # Skip creating the Azure OpenAI account
     [bool]$skipCreatingAzureOpenAIDeployment = $false, # Skip creating the Azure OpenAI deployment
-    [bool]$skipCreatingAzureOpenAICompletionDeployment = $false, # Skip creating the Azure OpenAI completion deployment
+    [bool]$skipCreatingAzureOpenAICompletionDeployment = $true, # Skip creating the Azure OpenAI completion deployment
 
     [string]$cosmosCluster, # The name of the Cosmos DB cluster
     [string]$cosmosClusterLocation, # The location for the Cosmos DB cluster
@@ -93,7 +93,7 @@ if ($changeSubscription) {
 }
 
 # Set the resource group
-$resourceGroup = if ($resourceGroup) { $resourceGroup } elseif ($useEnvFile -and $envVars['resourceGroup']) { $envVars['resourceGroup'] } else { "msdocs-cosmosdb-rg-$randomIdentifier" }
+$resourceGroup = if ($resourceGroup) { $resourceGroup } elseif ($useEnvFile -and $envVars['resourceGroup']) { $envVars['resourceGroup'] } else { "lab-rg-$randomIdentifier" }
 
 # Create a resource group
 if (! $skipCreatingResourceGroup) {
@@ -114,7 +114,7 @@ if (! $skipCreatingResourceGroup) {
 
 
 # Create MongoDB resources
-$cosmosCluster = if ($cosmosCluster) { $cosmosCluster } elseif ($useEnvFile -and $envVars['cosmosCluster']) { $envVars['cosmosCluster'] } else { "msdocs-cosmos-cluster-$randomIdentifier" } #needs to be lower case
+$cosmosCluster = if ($cosmosCluster) { $cosmosCluster } elseif ($useEnvFile -and $envVars['cosmosCluster']) { $envVars['cosmosCluster'] } else { "lab-cosmos-cluster-$randomIdentifier" } #needs to be lower case
 $cosmosClusterLocation = if ($cosmosClusterLocation) { $cosmosClusterLocation } elseif ($useEnvFile -and $envVars['cosmosClusterLocation']) { $envVars['cosmosClusterLocation'] } else { 'eastus' } 
 $cosmosClusterAdmin = if ($cosmosClusterAdmin) { $cosmosClusterAdmin } elseif ($useEnvFile -and $envVars['cosmosClusterAdmin']) { $envVars['cosmosClusterAdmin'] } else { "clusteradmin$randomIdentifier" }
 $tempPW = -join ((48..57) + (65..90) + (97..122) + (33..33) + (36..38) + (40..47) + (58..64) + (91..95) + (123..126) | Get-Random -Count 16 | % { [char]$_ })
@@ -123,7 +123,7 @@ $cosmosdbDatabase = if ($cosmosdbDatabase) { $cosmosdbDatabase } elseif ($useEnv
 
 if (! $skipCreatingCosmosDBPublicIPFirewallRule) {
     # Create a public IP firewall rule for the Cosmos DB account
-    $publicIpRuleName = "msdocs-cosmosdb-fw_rule-$randomIdentifier"
+    $publicIpRuleName = "lab-cosmosdb-fw_rule-$randomIdentifier"
     $publicIp = (Invoke-RestMethod -Uri http://ipinfo.io/json).ip
 } 
 else { 
@@ -180,7 +180,7 @@ $cosmosDbEndpoint = if ($useEnvFile -and $envVars['cosmosDbEndpoint']) { $envVar
 
 # Create an Azure OpenAI resource
 $cognitiveServicesKind = if ($useEnvFile -and $envVars['cognitiveServicesKind']) { $envVars['cognitiveServicesKind'] } else { "OpenAI" }
-$OpenAIAccount = if ($OpenAIAccount) { $OpenAIAccount } elseif ($useEnvFile -and $envVars['OpenAIAccount']) { $envVars['OpenAIAccount'] } else { "msdocs-account-openai-$randomIdentifier" } #needs to be lower case
+$OpenAIAccount = if ($OpenAIAccount) { $OpenAIAccount } elseif ($useEnvFile -and $envVars['OpenAIAccount']) { $envVars['OpenAIAccount'] } else { "lab-account-openai-$randomIdentifier" } #needs to be lower case
 $OpenAIAccountLocation = if ($OpenAIAccountLocation) { $OpenAIAccountLocation } elseif ($useEnvFile -and $envVars['OpenAIAccountLocation']) { $envVars['OpenAIAccountLocation'] } else { $location } 
 $OpenAIAccountSKU = if ($OpenAIAccountSKU) { $OpenAIAccountSKU } elseif ($useEnvFile -and $envVars['OpenAIAccountSKU']) { $envVars['OpenAIAccountSKU'] } else { "s0" }
 
@@ -202,7 +202,7 @@ if (! $skipCreatingAzureOpenAIAccount) {
     }
 }
 
-$OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "msdocs-account-openai-deployment-$randomIdentifier" }
+$OpenAIDeploymentName = if ($OpenAIDeploymentName) { $OpenAIDeploymentName } elseif ($useEnvFile -and $envVars['OpenAIDeploymentName']) { $envVars['OpenAIDeploymentName'] } else { "lab-account-openai-deployment" }
 $OpenAIDeploymentModel = if ($OpenAIDeploymentModel) { $OpenAIDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModel']) { $envVars['OpenAIDeploymentModel'] } else { "text-embedding-ada-002" }
 $OpenAIDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAIDeploymentModelFormat']) { $envVars['OpenAIDeploymentModelFormat'] } else { "OpenAI" }
 $OpenAIDeploymentModelVersion = if ($OpenAIDeploymentModelVersion) { $OpenAIDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAIDeploymentModelVersion']) { $envVars['OpenAIDeploymentModelVersion'] } else { "2" }
@@ -227,7 +227,7 @@ if (! $skipCreatingAzureOpenAIDeployment) {
     }
 }
 
-$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "msdocs-account-openai-completion-$randomIdentifier" }
+$OpenAICompletionDeploymentName = if ($OpenAICompletionDeploymentName) { $OpenAICompletionDeploymentName } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentName']) { $envVars['OpenAICompletionDeploymentName'] } else { "lab-account-openai-completion" }
 $OpenAICompletionDeploymentModel = if ($OpenAICompletionDeploymentModel) { $OpenAICompletionDeploymentModel } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModel']) { $envVars['OpenAICompletionDeploymentModel'] } else { "gpt-4o" }
 $OpenAICompletionDeploymentModelFormat = if ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelFormat']) { $envVars['OpenAICompletionDeploymentModelFormat'] } else { "OpenAI" }
 $OpenAICompletionDeploymentModelVersion = if ($OpenAICompletionDeploymentModelVersion) { $OpenAICompletionDeploymentModelVersion } elseif ($useEnvFile -and $envVars['OpenAICompletionDeploymentModelVersion']) { $envVars['OpenAICompletionDeploymentModelVersion'] } else { "2024-08-06" }
