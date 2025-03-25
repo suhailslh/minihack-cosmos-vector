@@ -226,7 +226,7 @@ Once the resources are created and your **.env** file is populated with the reso
 > OpenAIEndpoint="https://india-hack-2025.azure-api.net/"
 > OpenAIKey1="LGIsTheBestWeLoveHisShirts"
 > ```
-
+> Note that the OpenAI key in this specific case will be ignored by our APIM so you can put any value
 </div>
 
 ---
