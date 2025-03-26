@@ -101,7 +101,7 @@ if (! $skipCreatingResourceGroup) {
     Write-Host
 
     try {
-        $output = az group create --name $resourceGroup --location $location --only-show-errors
+        $output = az group create --name $resourceGroup --location $location --tags ContactEmailAddress=syed.salaha@zeiss.com SbxResourceGroupOwner=suhail --only-show-errors
         if ($LASTEXITCODE -ne 0) {
             throw $output
         }
@@ -164,7 +164,7 @@ if (! $skipCreatingCosmosDBCluster) {
 
     $cosmosParameters | ConvertTo-Json -Depth 10 | Out-File -FilePath 'cosmos-parameters.json' -Encoding utf8
     try {
-        $output = az deployment group create --resource-group $resourceGroup --template-file 'create-mongodb-vcore-cluster.bicep'  --parameters @cosmos-parameters.json
+        $output = az deployment group create --resource-group $resourceGroup --template-file 'src/create-mongodb-vcore-cluster.bicep'  --parameters @cosmos-parameters.json
         if ($LASTEXITCODE -ne 0) {
             throw $output
         }

@@ -1,0 +1,24 @@
+{
+  "contentVersion": "1.0.0.0",
+  "": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "parameters": {
+    "dblocation": {
+      "value": "eastus"
+    },
+    "publicIpRuleName": {
+      "value": "lab-cosmosdb-fw_rule-2039514828"
+    },
+    "adminPassword": {
+      "value": "E}X9=I.|Ps5>N)*<"
+    },
+    "publicIp": {
+      "value": "13.71.3.102"
+    },
+    "adminUsername": {
+      "value": "clusteradmin2039514828"
+    },
+    "clusterName": {
+      "value": "lab-cosmos-cluster-2039514828"
+    }
+  }
+}
