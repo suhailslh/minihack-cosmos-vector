@@ -62,6 +62,8 @@ To retrieve the lab content :
 
 </div>
 
+[fork-repo]:https://github.com/lgmorand/minihack-cosmos-vector/fork
+
 ### 🥇 : Pre-configured GitHub Codespace
 
 To use a Github Codespace, you will need :
@@ -83,6 +85,8 @@ To get your codespace ready for the labs, here are a few steps to execute :
 
 ![codespace-configure](./assets/codespace-configure.png)
 
+[github-account]:https://github.com/join
+
 ### 🥈 : Using a local Devcontainer
 
 This repo comes with a Devcontainer configuration that will let you open a fully configured dev environment from your local Visual Studio Code, while still being completely isolated from the rest of your local machine configuration : No more dependancy conflict.
@@ -101,6 +105,11 @@ If you are not prompted by Visual Studio Code, you can open the command palette 
 
 ![devcontainer-reopen](./assets/devcontainer-reopen.png)
 
+[git-client]: https://git-scm.com/downloads
+[git-clone]: https://git-scm.com/docs/git-clone
+[docker-desktop]: https://www.docker.com/products/docker-desktop/
+[vs-code]: https://code.visualstudio.com/
+
 ### 🥉 : Using your own local environment
 
 The following tools and access will be necessary to run the lab in good conditions on a local environment :
@@ -116,6 +125,13 @@ The following tools and access will be necessary to run the lab in good conditio
 Once you have set up your local environment, you can clone the Hands-on-lab-serverless repo you just forked on your machine, and open the local folder in Visual Studio Code and head to the next step.
 
 Let's begin!
+
+[az-portal]: https://portal.azure.com
+[git-client]: https://git-scm.com/downloads
+[download-powershell]: https://learn.microsoft.com/fr-fr/powershell/scripting/install/installing-powershell?view=powershell-7.5
+[az-cli-install]: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+[download-python]: https://www.python.org/downloads/
+[download-node]: https://nodejs.org/en
 
 ## Create Azure Resources
 
@@ -220,13 +236,16 @@ Once the resources are created and your **.env** file is populated with the reso
 <div class="warning" data-title="Critical">
 
 > During the Bengaluru Openhack, you will **not** use your own OpenAI endpoint due to quotas limitations but a mutli-region endpoint we created especially for today. You will have to use and replace inside the .env file some parameters with values provided by your coach.
-> 
+>
 > For instance, try to replace with these two values:
-> ``` yaml
+>
+> ```yaml
 > OpenAIEndpoint="https://india-hack-2025.azure-api.net/"
 > OpenAIKey1="LGIsTheBestWeLoveHisShirts"
 > ```
+>
 > Note that the OpenAI key in this specific case will be ignored by our APIM so you can put any value
+
 </div>
 
 ---
@@ -989,22 +1008,3 @@ This cleanup process helps maintain your Azure account organized and free from u
 In this lab, you employed Azure OpenAI to generate embeddings for vCore-based Azure Cosmos DB for MongoDB documents and built a vector index for in-depth searches, effectively integrating these tools as your AI copilot. By transforming user prompts into embeddings to search for similar documents in the database, and then enhancing these search outcomes using GPT-4o chat from Azure OpenAI, you effectively demonstrated a Retrieval-Augmented Generation (RAG) approach. This step shows how integrating AI with database searches can refine the relevance and depth of query results.
 
 This lab not only guided you through the technical steps of implementing vector search and AI enhancements. The lab also illustrated the powerful capabilities of the Retrieval-Augmented Generation (RAG) approach in creating more dynamic, intelligent, and user-friendly data retrieval systems.
-
-[az-cli-install]: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
-[az-func-core-tools]: https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Clinux%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools
-[az-func-languages]: https://learn.microsoft.com/en-us/azure/azure-functions/functions-versions#languages
-[az-naming-convention]: https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-naming
-[az-abrevation]: https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations
-[az-portal]: https://portal.azure.com
-[vs-code]: https://code.visualstudio.com/
-[azure-function-vs-code-extension]: https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions
-[docker-desktop]: https://www.docker.com/products/docker-desktop/
-[Repo-fork]: https://github.com/microsoft/hands-on-lab-serverless/fork
-[git-client]: https://git-scm.com/downloads
-[github-account]: https://github.com/join
-[download-dotnet]: https://dotnet.microsoft.com/en-us/download/dotnet/7.0
-[download-python]: https://www.python.org/downloads/
-[download-node]: https://nodejs.org/en
-[fork-repo]: https://github.com/lgmorand/minihack-cosmos-vector/fork
-[git-clone]: https://git-scm.com/docs/git-clone
-[download-powershell]: https://learn.microsoft.com/fr-fr/powershell/scripting/install/installing-powershell?view=powershell-7.5
